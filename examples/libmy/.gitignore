@@ -1,0 +1,4 @@
+.epine
+unit_tests
+*.a
+*.o
