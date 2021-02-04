@@ -6,7 +6,11 @@ tek:project "libmy" {"libmy.so", "hello"}
 -- the first target will be the default one
 -- its name will be replaced by the $(NAME) variable in the generated Makefile
 tek:shared "libmy.so" {
-    language = "C"
+    language = "C",
+    defines = {
+        "MY_ALLOW_FUN_MALLOC",
+        "MY_ALLOW_FUN_FREE"
+    }
 }
 
 -- some random binary that says hello using the libmy

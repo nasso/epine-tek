@@ -16,12 +16,15 @@ __NAME__OBJS := $(__NAME__OBJS:.c=.o)
 __NAME__DEPS := $(__NAME__OBJS:.o=.d)
 $(NAME): CPPFLAGS += -MD -MP
 $(NAME): CPPFLAGS += -Iinclude
+$(NAME): CPPFLAGS += -DMY_ALLOW_FUN_MALLOC
+$(NAME): CPPFLAGS += -DMY_ALLOW_FUN_FREE
 $(NAME): CFLAGS += -fPIC
 $(NAME): CFLAGS += -Wall
 $(NAME): CFLAGS += -Wextra
 $(NAME): CFLAGS += $(if DEBUG,-g3)
 $(NAME): LDFLAGS += -shared
-$(NAME): LDFLAGS += -L. -L./lib
+$(NAME): LDFLAGS += -L.
+$(NAME): LDFLAGS += -L./lib
 $(NAME): LDFLAGS += -Wl,-rpath .
 $(NAME): $(__NAME__OBJS)
 	$(CC) -o $@ $(__NAME__OBJS) $(LDFLAGS) $(LDLIBS)
@@ -37,7 +40,8 @@ hello: CFLAGS += -Wall
 hello: CFLAGS += -Wextra
 hello: CFLAGS += $(if DEBUG,-g3)
 hello: LDLIBS += -lmy
-hello: LDFLAGS += -L. -L./lib
+hello: LDFLAGS += -L.
+hello: LDFLAGS += -L./lib
 hello: LDFLAGS += -Wl,-rpath .
 hello $(hello_OBJS): libmy.so
 hello: $(hello_OBJS)

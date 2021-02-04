@@ -1,5 +1,5 @@
 local array = require "array"
-local cc = require "@nasso/epine-cc/v0.2.0-alpha3"
+local cc = require "@nasso/epine-cc/v0.2.0-alpha4"
 
 local function epitech_header(projectname, description)
     description = description or "Makefile automatically generated using Epine!"
@@ -88,6 +88,7 @@ function Tek:target(name)
                 prerequisites = cfg.prerequisites,
                 srcs = cfg.srcs or {find "./src/*.c"},
                 incdirs = cfg.incdirs or {"include"},
+                defines = cfg.defines,
                 libs = cfg.libs or {},
                 libdirs = cfg.libdirs or {".", "./lib"},
                 cflags = cfg.cflags or {"-Wall", "-Wextra", "$(if DEBUG,-g3)"},
