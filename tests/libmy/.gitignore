@@ -1,4 +1,6 @@
 .epine
-unit_tests
 *.a
 *.o
+*.d
+hello
+libmy.so

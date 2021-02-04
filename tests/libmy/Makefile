@@ -5,61 +5,55 @@
 ## Makefile automatically generated using Epine!
 ##
 
-NAME = libmy.a
+NAME = libmy.so
 
-all: libmy.a hello
+all: libmy.so hello
 .PHONY: all
 
-EPINE_CC___NAME__SRCS := $(shell find -path './src/*.c')
-EPINE_CC___NAME__CFLAGS := -Wall -Wextra -pedantic $(if DEBUG,-g3)
-EPINE_CC___NAME__LDLIBS :=
-EPINE_CC___NAME__LDFLAGS :=
-EPINE_CC___NAME__OBJS := $(EPINE_CC___NAME__SRCS:.c=.o)
-EPINE_CC___NAME__CFLAGS += -Iinclude
-EPINE_CC___NAME__LDFLAGS += -L. -L./lib
-$(NAME): $(EPINE_CC___NAME__OBJS)
-	$(AR) rc $@ $(EPINE_CC___NAME__OBJS)
-$(EPINE_CC___NAME__OBJS): %.o: %.c
-	$(CC) $(CFLAGS) $(EPINE_CC___NAME__CFLAGS) -c -o $@ $<
+__NAME__SRCS := $(shell find -path './src/*.c')
+__NAME__OBJS := $(filter %.c,$(__NAME__SRCS))
+__NAME__OBJS := $(__NAME__OBJS:.c=.o)
+__NAME__DEPS := $(__NAME__OBJS:.o=.d)
+$(NAME): CPPFLAGS += -MD -MP
+$(NAME): CPPFLAGS += -Iinclude
+$(NAME): CFLAGS += -fPIC
+$(NAME): CFLAGS += -Wall
+$(NAME): CFLAGS += -Wextra
+$(NAME): CFLAGS += $(if DEBUG,-g3)
+$(NAME): LDFLAGS += -shared
+$(NAME): LDFLAGS += -L. -L./lib
+$(NAME): LDFLAGS += -Wl,-rpath .
+$(NAME): $(__NAME__OBJS)
+	$(CC) -o $@ $(__NAME__OBJS) $(LDFLAGS) $(LDLIBS)
+-include $(__NAME__DEPS)
 
-EPINE_CC_hello_SRCS := main.c
-EPINE_CC_hello_CFLAGS := -Wall -Wextra -pedantic $(if DEBUG,-g3)
-EPINE_CC_hello_LDLIBS :=
-EPINE_CC_hello_LDFLAGS :=
-EPINE_CC_hello_OBJS := $(EPINE_CC_hello_SRCS:.c=.o)
-EPINE_CC_hello_CFLAGS += -Iinclude
-EPINE_CC_hello_LDLIBS += -lmy
-EPINE_CC_hello_LDFLAGS += -L. -L./lib
-hello $(EPINE_CC_hello_OBJS): libmy.a
-hello: $(EPINE_CC_hello_OBJS)
-	$(CC) -o $@ $(EPINE_CC_hello_OBJS) $(EPINE_CC_hello_LDLIBS) $(EPINE_CC_hello_LDFLAGS)
-$(EPINE_CC_hello_OBJS): %.o: %.c
-	$(CC) $(CFLAGS) $(EPINE_CC_hello_CFLAGS) -c -o $@ $<
-
-EPINE_CC_unit_tests_SRCS := $(shell find -path './tests/*.c')
-EPINE_CC_unit_tests_CFLAGS := -Wall -Wextra -pedantic $(if DEBUG,-g3)
-EPINE_CC_unit_tests_LDLIBS :=
-EPINE_CC_unit_tests_LDFLAGS :=
-EPINE_CC_unit_tests_OBJS := $(EPINE_CC_unit_tests_SRCS:.c=.o)
-EPINE_CC_unit_tests_CFLAGS += -Iinclude
-EPINE_CC_unit_tests_LDLIBS += -l:$(NAME) -lcriterion
-EPINE_CC_unit_tests_LDFLAGS += -L.
-unit_tests $(EPINE_CC_unit_tests_OBJS): $(NAME)
-unit_tests: $(EPINE_CC_unit_tests_OBJS)
-	$(CC) -o $@ $(EPINE_CC_unit_tests_OBJS) $(EPINE_CC_unit_tests_LDLIBS) $(EPINE_CC_unit_tests_LDFLAGS)
-$(EPINE_CC_unit_tests_OBJS): %.o: %.c
-	$(CC) $(CFLAGS) $(EPINE_CC_unit_tests_CFLAGS) -c -o $@ $<
+hello_SRCS := main.c
+hello_OBJS := $(filter %.c,$(hello_SRCS))
+hello_OBJS := $(hello_OBJS:.c=.o)
+hello_DEPS := $(hello_OBJS:.o=.d)
+hello: CPPFLAGS += -MD -MP
+hello: CPPFLAGS += -Iinclude
+hello: CFLAGS += -Wall
+hello: CFLAGS += -Wextra
+hello: CFLAGS += $(if DEBUG,-g3)
+hello: LDLIBS += -lmy
+hello: LDFLAGS += -L. -L./lib
+hello: LDFLAGS += -Wl,-rpath .
+hello $(hello_OBJS): libmy.so
+hello: $(hello_OBJS)
+	$(CC) -o $@ $(hello_OBJS) $(LDFLAGS) $(LDLIBS)
+-include $(hello_DEPS)
 
 tests_run: unit_tests
 	./unit_tests $(ARGS)
 .PHONY: tests_run
 
 clean:
-	$(RM) $(EPINE_CC___NAME__OBJS) $(EPINE_CC_hello_OBJS) $(EPINE_CC_unit_tests_OBJS)
+	$(RM) $(__NAME__DEPS) $(__NAME__OBJS) $(hello_DEPS) $(hello_OBJS)
 .PHONY: clean
 
 fclean:
-	$(RM) $(EPINE_CC___NAME__OBJS) $(EPINE_CC_hello_OBJS) $(EPINE_CC_unit_tests_OBJS)
+	$(RM) $(__NAME__DEPS) $(__NAME__OBJS) $(hello_DEPS) $(hello_OBJS)
 	$(RM) $(NAME) hello
 	$(RM) unit_tests
 .PHONY: fclean

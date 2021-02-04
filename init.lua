@@ -1,14 +1,5 @@
-local cc = require "@nasso/epine-cc/v0.2.0-alpha2"
-
-local function prefix(t, p)
-    local pt = {}
-
-    for i, v in ipairs(t) do
-        pt[i] = tostring(p) .. tostring(v)
-    end
-
-    return pt
-end
+local array = require "array"
+local cc = require "@nasso/epine-cc/v0.2.0-alpha3"
 
 local function epitech_header(projectname, description)
     description = description or "Makefile automatically generated using Epine!"
@@ -21,6 +12,15 @@ local function epitech_header(projectname, description)
         epine.comment("# " .. description),
         epine.comment("#")
     }
+end
+
+local function flatpre(t, pre)
+    return array.flatmap(
+        t,
+        function(v)
+            return tostring(pre) .. tostring(v)
+        end
+    )
 end
 
 ---
@@ -44,8 +44,6 @@ function Tek.mt.__call(_)
     self._tests = true
     self.cc = cc.new()
 
-    self.cc.cflags = {"-Wall", "-Wextra", "$(if DEBUG,-g3)"}
-
     return self
 end
 
@@ -53,10 +51,6 @@ end
 
 function Tek.new()
     return Tek()
-end
-
-function Tek:tests(flag)
-    self._tests = flag ~= false
 end
 
 function Tek:project(name)
@@ -90,14 +84,16 @@ function Tek:target(name)
             name = name,
             cfg = {
                 type = cfg.type,
-                language = cfg.language,
+                language = cfg.language or "C",
                 prerequisites = cfg.prerequisites,
                 srcs = cfg.srcs or {find "./src/*.c"},
                 incdirs = cfg.incdirs or {"include"},
                 libs = cfg.libs or {},
                 libdirs = cfg.libdirs or {".", "./lib"},
-                defines = cfg.defines or {},
-                cflags = cfg.cflags or {}
+                cflags = cfg.cflags or {"-Wall", "-Wextra", "$(if DEBUG,-g3)"},
+                cxxflags = cfg.cxxflags or
+                    {"-Wall", "-Wextra", "$(if DEBUG,-g3)"},
+                ldflags = cfg.ldflags or {"-Wl,-rpath ."}
             }
         }
     end
@@ -140,10 +136,7 @@ function Tek:make()
     assert(self:check())
 
     -- generate the makefile
-    local unit_tests_override = false
     local fclean_list = {}
-    local static_lib_names = {}
-    local static_lib_incdirs = {}
 
     local mk = {
         epitech_header(self._projectname),
@@ -162,43 +155,30 @@ function Tek:make()
             name = "$(NAME)"
         end
 
-        -- collect info about static libraries for tests
-        if target.cfg.type == "static" then
-            static_lib_names[#static_lib_names + 1] = name
-
-            if target.cfg.incdirs then
-                static_lib_incdirs[#static_lib_incdirs + 1] = target.cfg.incdirs
-            end
-        end
-
-        unit_tests_override = unit_tests_override or name == "unit_tests"
         fclean_list[#fclean_list + 1] = name
 
         mk[#mk + 1] = {
             epine.br,
             self.cc:target(name) {
                 type = target.cfg.type,
+                lang = target.cfg.language,
                 prerequisites = target.cfg.prerequisites,
                 srcs = target.cfg.srcs,
-                incdirs = target.cfg.incdirs,
-                libs = target.cfg.libs,
-                libdirs = target.cfg.libdirs,
-                defines = target.cfg.defines,
-                cflags = target.cfg.cflags
-            }
-        }
-    end
-
-    if self._tests and not unit_tests_override then
-        -- unit tests for all the static libraries
-        mk[#mk + 1] = {
-            epine.br,
-            self.cc:binary "unit_tests" {
-                prerequisites = static_lib_names,
-                srcs = {find "./tests/*.c"},
-                incdirs = static_lib_incdirs,
-                libs = {prefix(static_lib_names, ":"), "criterion"},
-                libdirs = {"."}
+                cppflags = {
+                    flatpre(target.cfg.incdirs or {}, "-I"),
+                    flatpre(target.cfg.defines or {}, "-D"),
+                    target.cfg.cppflags
+                },
+                cflags = target.cfg.cflags,
+                cxxflags = target.cfg.cxxflags,
+                ldlibs = {
+                    flatpre(target.cfg.libs or {}, "-l"),
+                    target.cfg.ldlibs
+                },
+                ldflags = {
+                    flatpre(target.cfg.libdirs or {}, "-L"),
+                    target.cfg.ldflags
+                }
             }
         }
     end
