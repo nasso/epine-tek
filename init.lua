@@ -1,5 +1,5 @@
 local array = require "array"
-local cc = require "@nasso/epine-cc/v0.2.0-alpha5"
+local cc = require "@nasso/epine-cc/v0.2.0-alpha6"
 
 local function epitech_header(projectname, description)
     description = description or "Makefile automatically generated using Epine!"

@@ -34,11 +34,11 @@ $(NAME): $(__NAME__OBJS)
 	$(CC) -o $@ $(__NAME__OBJS) $(LDFLAGS) $(LDLIBS)
 -include $(__NAME__DEPS)
 
-hello $(hello_OBJS): libmy.so
 hello_SRCS := main.c
 hello_OBJS := $(filter %.c,$(hello_SRCS))
 hello_OBJS := $(hello_OBJS:.c=.o)
 hello_DEPS := $(hello_OBJS:.o=.d)
+hello $(hello_OBJS): libmy.so
 hello: CPPFLAGS :=
 hello: CPPFLAGS += -MD -MP
 hello: CPPFLAGS += -Iinclude
