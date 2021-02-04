@@ -1,4 +1,4 @@
-local cc = require "@nasso/epine-cc/v0.1.1-alpha"
+local cc = require "@nasso/epine-cc/v0.2.0-alpha2"
 
 local function prefix(t, p)
     local pt = {}
@@ -44,7 +44,7 @@ function Tek.mt.__call(_)
     self._tests = true
     self.cc = cc.new()
 
-    self.cc.cflags = {"-Wall", "-Wextra", "-pedantic", "$(if DEBUG,-g3)"}
+    self.cc.cflags = {"-Wall", "-Wextra", "$(if DEBUG,-g3)"}
 
     return self
 end
@@ -89,15 +89,15 @@ function Tek:target(name)
         self._targets[#self._targets + 1] = {
             name = name,
             cfg = {
-                language = cfg.language,
                 type = cfg.type,
+                language = cfg.language,
                 prerequisites = cfg.prerequisites,
                 srcs = cfg.srcs or {find "./src/*.c"},
                 incdirs = cfg.incdirs or {"include"},
-                libs = cfg.libs,
+                libs = cfg.libs or {},
                 libdirs = cfg.libdirs or {".", "./lib"},
-                defines = cfg.defines,
-                cflags = cfg.cflags
+                defines = cfg.defines or {},
+                cflags = cfg.cflags or {}
             }
         }
     end
