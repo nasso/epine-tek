@@ -14,14 +14,18 @@ __NAME__SRCS := $(shell find -path './src/*.c')
 __NAME__OBJS := $(filter %.c,$(__NAME__SRCS))
 __NAME__OBJS := $(__NAME__OBJS:.c=.o)
 __NAME__DEPS := $(__NAME__OBJS:.o=.d)
+$(NAME): CPPFLAGS :=
 $(NAME): CPPFLAGS += -MD -MP
 $(NAME): CPPFLAGS += -Iinclude
 $(NAME): CPPFLAGS += -DMY_ALLOW_FUN_MALLOC
 $(NAME): CPPFLAGS += -DMY_ALLOW_FUN_FREE
+$(NAME): CFLAGS :=
 $(NAME): CFLAGS += -fPIC
 $(NAME): CFLAGS += -Wall
 $(NAME): CFLAGS += -Wextra
 $(NAME): CFLAGS += $(if DEBUG,-g3)
+$(NAME): LDLIBS :=
+$(NAME): LDFLAGS :=
 $(NAME): LDFLAGS += -shared
 $(NAME): LDFLAGS += -L.
 $(NAME): LDFLAGS += -L./lib
@@ -30,20 +34,24 @@ $(NAME): $(__NAME__OBJS)
 	$(CC) -o $@ $(__NAME__OBJS) $(LDFLAGS) $(LDLIBS)
 -include $(__NAME__DEPS)
 
+hello $(hello_OBJS): libmy.so
 hello_SRCS := main.c
 hello_OBJS := $(filter %.c,$(hello_SRCS))
 hello_OBJS := $(hello_OBJS:.c=.o)
 hello_DEPS := $(hello_OBJS:.o=.d)
+hello: CPPFLAGS :=
 hello: CPPFLAGS += -MD -MP
 hello: CPPFLAGS += -Iinclude
+hello: CFLAGS :=
 hello: CFLAGS += -Wall
 hello: CFLAGS += -Wextra
 hello: CFLAGS += $(if DEBUG,-g3)
+hello: LDLIBS :=
 hello: LDLIBS += -lmy
+hello: LDFLAGS :=
 hello: LDFLAGS += -L.
 hello: LDFLAGS += -L./lib
 hello: LDFLAGS += -Wl,-rpath .
-hello $(hello_OBJS): libmy.so
 hello: $(hello_OBJS)
 	$(CC) -o $@ $(hello_OBJS) $(LDFLAGS) $(LDLIBS)
 -include $(hello_DEPS)
