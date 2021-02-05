@@ -64,11 +64,11 @@ function Tek.mt.__call(_)
     self.cc.quiet = true
 
     function self.cc.oncompile(dst, src, lang)
-        return echo("[" .. lang .. "] " .. src .. " '->' " .. dst)
+        return echo("[" .. lang .. "] " .. dst)
     end
 
     function self.cc.onlink(dst, src, type)
-        return echo("[" .. type .. "] " .. src .. " '->' " .. dst)
+        return echo("[" .. type .. "] " .. dst)
     end
 
     return self
