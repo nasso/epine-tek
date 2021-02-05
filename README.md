@@ -5,7 +5,7 @@ Simple Epine module for C/C++ projects at [Epitech].
 ## Example usage
 
 ```lua
-local tek = require "@nasso/epine-tek/v0.1.0-alpha6"
+local tek = require "@nasso/epine-tek/v0.1.0-alpha8"
 
 --       project name//default targets
 tek:project "libjzon" {"libjzon.a"}
