@@ -38,4 +38,54 @@ function array.flatmap(t, fn)
     return array.map(array.flatten(t), fn)
 end
 
+function array.unmap(t, fn)
+    local arr = {}
+
+    for k, v in pairs(t) do
+        arr[#arr + 1] = fn(k, v)
+    end
+
+    return arr
+end
+
+function array.mapf(t, f, ...)
+    local map =
+        array.map(
+        t,
+        function(v)
+            return v[f]
+        end
+    )
+
+    if ... then
+        return array.mapf(map, ...)
+    else
+        return map
+    end
+end
+
+function array.find(t, fn)
+    for _, v in ipairs(t) do
+        if fn(v) then
+            return v
+        end
+    end
+
+    return nil
+end
+
+function array.uniques(t)
+    local uniques = {}
+    local set = {}
+
+    for _, v in ipairs(t) do
+        if not set[v] then
+            uniques[#uniques + 1] = v
+            set[v] = true
+        end
+    end
+
+    return uniques
+end
+
 return array
