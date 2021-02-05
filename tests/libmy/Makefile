@@ -31,7 +31,8 @@ $(NAME): LDFLAGS += -shared
 $(NAME): LDFLAGS += -L.
 $(NAME): LDFLAGS += -Wl,-rpath .
 $(NAME): $(__NAME__OBJS)
-	$(CC) -o $@ $(__NAME__OBJS) $(LDFLAGS) $(LDLIBS)
+	@echo [shared] $^ '->' $@
+	@$(CC) -o $@ $(__NAME__OBJS) $(LDFLAGS) $(LDLIBS)
 -include $(__NAME__DEPS)
 
 hello_SRCS := main.c
@@ -52,8 +53,16 @@ hello: LDFLAGS :=
 hello: LDFLAGS += -L.
 hello: LDFLAGS += -Wl,-rpath .
 hello: $(hello_OBJS)
-	$(CC) -o $@ $(hello_OBJS) $(LDFLAGS) $(LDLIBS)
+	@echo [binary] $^ '->' $@
+	@$(CC) -o $@ $(hello_OBJS) $(LDFLAGS) $(LDLIBS)
 -include $(hello_DEPS)
+
+%.o: %.c
+	@echo [C] $< '->' $@
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+%.o: %.cpp
+	@echo [C++] $< '->' $@
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 tests_run: ./unit_tests
 	./unit_tests $(ARGS)

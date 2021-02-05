@@ -1,5 +1,5 @@
 local array = require "array"
-local cc = require "@nasso/epine-cc/v0.2.0-alpha6"
+local cc = require "@nasso/epine-cc/v0.2.0-alpha7"
 
 local function epitech_header(projectname, description)
     description = description or "Makefile automatically generated using Epine!"
@@ -60,6 +60,16 @@ function Tek.mt.__call(_)
     }
     self.cc = cc.new()
     self.cleanlist = {}
+
+    self.cc.quiet = true
+
+    function self.cc.oncompile(dst, src, lang)
+        return echo("[" .. lang .. "] " .. src .. " '->' " .. dst)
+    end
+
+    function self.cc.onlink(dst, src, type)
+        return echo("[" .. type .. "] " .. src .. " '->' " .. dst)
+    end
 
     return self
 end
@@ -316,6 +326,9 @@ function Tek:make()
             }
         }
     end
+
+    mk[#mk + 1] = epine.br
+    mk[#mk + 1] = self.cc:override_implicits()
 
     local cleanactions = {
         rm(self.cc.cleanlist),

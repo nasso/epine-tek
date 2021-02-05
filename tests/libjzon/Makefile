@@ -24,7 +24,8 @@ $(NAME): CFLAGS += -Wall
 $(NAME): CFLAGS += -Wextra
 $(NAME): CFLAGS += $(if DEBUG,-g3)
 $(NAME): $(__NAME__OBJS)
-	$(AR) rc $@ $(__NAME__OBJS)
+	@echo [static] $^ '->' $@
+	@$(AR) rc $@ $(__NAME__OBJS)
 -include $(__NAME__DEPS)
 
 unit_tests_SRCS := $(shell find -path './tests/*.c')
@@ -48,8 +49,16 @@ unit_tests: LDFLAGS :=
 unit_tests: LDFLAGS += -L.
 unit_tests: LDFLAGS += -Wl,-rpath .
 unit_tests: $(unit_tests_OBJS)
-	$(CC) -o $@ $(unit_tests_OBJS) $(LDFLAGS) $(LDLIBS)
+	@echo [binary] $^ '->' $@
+	@$(CC) -o $@ $(unit_tests_OBJS) $(LDFLAGS) $(LDLIBS)
 -include $(unit_tests_DEPS)
+
+%.o: %.c
+	@echo [C] $< '->' $@
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+%.o: %.cpp
+	@echo [C++] $< '->' $@
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 tests_run: ./unit_tests
 	./unit_tests $(ARGS)
@@ -81,4 +90,5 @@ pull:
 ./lib/libmy:
 	$(error $@ wasn't found! don't forget to `make pull`)
 ./lib/libmy/%: | ./lib/libmy
-	$(MAKE) -C ./lib/libmy $* clean
+	$(MAKE) -C ./lib/libmy $*
+	$(MAKE) -C ./lib/libmy clean
