@@ -5,10 +5,13 @@ Simple Epine module for C/C++ projects at [Epitech].
 ## Example usage
 
 ```lua
-local tek = require "@nasso/epine-tek/v0.1.0-alpha8"
+local tek = require "@nasso/epine-tek/v0.2.0-alpha"
 
 --       project name//default targets
 tek:project "libjzon" {"libjzon.a"}
+
+-- binary name ("$(NAME)" in the generated Makefile)
+tek:name "libjzon.a"
 
 -- a static library (the .a suffix is added automatically)
 tek:static "libjzon" {
