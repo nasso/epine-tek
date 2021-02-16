@@ -104,15 +104,23 @@ function Tek:default(...)
     end
 end
 
+function Tek:name(name)
+    assert(type(name) == "string", "the binary name must be a single string")
+    self._name = name
+end
+
+function Tek:get_target_rule(name)
+    if name == self._name then
+        return "$(NAME)"
+    else
+        return name
+    end
+end
+
 function Tek:target(name, target_name)
     target_name = target_name or name
 
     return function(cfg)
-        -- first target is $(NAME)
-        if #self._targets == 0 then
-            self._name = target_name
-        end
-
         self._targets[#self._targets + 1] = {
             name = name,
             target_name = target_name,
@@ -181,12 +189,12 @@ function Tek:ref(name)
 
         if targ then
             local info = {
-                target = targ.target_name,
+                target = self:get_target_rule(targ.target_name),
                 incdirs = targ.cfg.incdirs
             }
 
             if targ.cfg.type ~= "binary" then
-                info.libname = ":" .. targ.target_name
+                info.libname = ":" .. self:get_target_rule(targ.target_name)
             end
 
             return info
@@ -236,25 +244,36 @@ function Tek:make()
     -- generate the makefile
     local fclean_list = {}
 
-    local mk = {
-        epitech_header(self._projectname),
-        epine.br,
-        epine.var("NAME", self._name),
+    local mk = {epitech_header(self._projectname)}
+
+    if self._name then
+        mk[#mk + 1] = {
+            epine.br,
+            epine.var("NAME", self._name)
+        }
+    end
+
+    mk[#mk + 1] = {
         epine.br,
         action(self.actions.all) {
-            prerequisites = {fconcat(self._default)}
+            prerequisites = {
+                fconcat(
+                    array.flatmap(
+                        self._default,
+                        function(p)
+                            return self:get_target_rule(p)
+                        end
+                    )
+                )
+            }
         }
     }
 
     for _, target in ipairs(self._targets) do
         local name = target.name
-        local target_name = target.target_name
+        local target_rule_name = self:get_target_rule(target.target_name)
 
-        if target_name == self._name then
-            target_name = "$(NAME)"
-        end
-
-        fclean_list[#fclean_list + 1] = target_name
+        fclean_list[#fclean_list + 1] = target_rule_name
 
         local libs = {}
 
@@ -290,7 +309,7 @@ function Tek:make()
 
         mk[#mk + 1] = {
             epine.br,
-            self.cc:target(target_name) {
+            self.cc:target(target_rule_name) {
                 type = target.cfg.type,
                 lang = target.cfg.language,
                 prerequisites = array.uniques(

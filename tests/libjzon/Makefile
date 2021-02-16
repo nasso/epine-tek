@@ -7,7 +7,7 @@
 
 NAME = libjzon.a
 
-all: libjzon.a
+all: $(NAME)
 .PHONY: all
 
 __NAME__SRCS := $(shell find -path './src/*.c')
@@ -24,7 +24,7 @@ $(NAME): CFLAGS += -Wall
 $(NAME): CFLAGS += -Wextra
 $(NAME): CFLAGS += $(if DEBUG,-g3)
 $(NAME): $(__NAME__OBJS)
-	@echo [static] $^ '->' $@
+	@echo [static] $@
 	@$(AR) rc $@ $(__NAME__OBJS)
 -include $(__NAME__DEPS)
 
@@ -32,7 +32,7 @@ unit_tests_SRCS := $(shell find -path './tests/*.c')
 unit_tests_OBJS := $(filter %.c,$(unit_tests_SRCS))
 unit_tests_OBJS := $(unit_tests_OBJS:.c=.o)
 unit_tests_DEPS := $(unit_tests_OBJS:.o=.d)
-unit_tests $(unit_tests_OBJS): libjzon.a ./lib/libmy/libmy.a
+unit_tests $(unit_tests_OBJS): $(NAME) ./lib/libmy/libmy.a
 unit_tests: CPPFLAGS :=
 unit_tests: CPPFLAGS += -MD -MP
 unit_tests: CPPFLAGS += -I./include
@@ -42,22 +42,22 @@ unit_tests: CFLAGS += -Wall
 unit_tests: CFLAGS += -Wextra
 unit_tests: CFLAGS += $(if DEBUG,-g3)
 unit_tests: LDLIBS :=
-unit_tests: LDLIBS += -l:libjzon.a
+unit_tests: LDLIBS += -l:$(NAME)
 unit_tests: LDLIBS += -l:./lib/libmy/libmy.a
 unit_tests: LDLIBS += -lcriterion
 unit_tests: LDFLAGS :=
 unit_tests: LDFLAGS += -L.
 unit_tests: LDFLAGS += -Wl,-rpath .
 unit_tests: $(unit_tests_OBJS)
-	@echo [binary] $^ '->' $@
+	@echo [binary] $@
 	@$(CC) -o $@ $(unit_tests_OBJS) $(LDFLAGS) $(LDLIBS)
 -include $(unit_tests_DEPS)
 
 %.o: %.c
-	@echo [C] $< '->' $@
+	@echo [C] $@
 	@$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 %.o: %.cpp
-	@echo [C++] $< '->' $@
+	@echo [C++] $@
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 tests_run: ./unit_tests

@@ -1,6 +1,7 @@
 local tek = require "../../init"
 
 tek:project "libjzon" {"libjzon.a"}
+tek:name "libjzon.a"
 
 tek:static "libjzon" {
     libs = {tek:ref "libmy"}

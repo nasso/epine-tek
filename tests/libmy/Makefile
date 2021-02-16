@@ -7,7 +7,7 @@
 
 NAME = libmy.so
 
-all: libmy.so hello
+all: $(NAME) hello
 .PHONY: all
 
 __NAME__SRCS := $(shell find -path './src/*.c')
@@ -31,7 +31,7 @@ $(NAME): LDFLAGS += -shared
 $(NAME): LDFLAGS += -L.
 $(NAME): LDFLAGS += -Wl,-rpath .
 $(NAME): $(__NAME__OBJS)
-	@echo [shared] $^ '->' $@
+	@echo [shared] $@
 	@$(CC) -o $@ $(__NAME__OBJS) $(LDFLAGS) $(LDLIBS)
 -include $(__NAME__DEPS)
 
@@ -53,15 +53,15 @@ hello: LDFLAGS :=
 hello: LDFLAGS += -L.
 hello: LDFLAGS += -Wl,-rpath .
 hello: $(hello_OBJS)
-	@echo [binary] $^ '->' $@
+	@echo [binary] $@
 	@$(CC) -o $@ $(hello_OBJS) $(LDFLAGS) $(LDLIBS)
 -include $(hello_DEPS)
 
 %.o: %.c
-	@echo [C] $< '->' $@
+	@echo [C] $@
 	@$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 %.o: %.cpp
-	@echo [C++] $< '->' $@
+	@echo [C++] $@
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 tests_run: ./unit_tests

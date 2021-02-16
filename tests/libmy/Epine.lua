@@ -2,6 +2,7 @@ local tek = require "../../init"
 
 -- name the project (the given name will appear in the header)
 tek:project "libmy" {"libmy.so", "hello"}
+tek:name "libmy.so"
 
 -- the first target will be the default one
 -- its name will be replaced by the $(NAME) variable in the generated Makefile
